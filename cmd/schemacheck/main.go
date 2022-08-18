@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,7 +23,7 @@ func (f *ArrayFlag) Set(value string) error {
 	return nil
 }
 
-var schemadir = flag.String("s", "", "Directory to load json schemas from")
+var schemafile = flag.String("s", "", "Directory to load json schemas from")
 var docs ArrayFlag
 
 func loaderForFile(fname string) (gojsonschema.JSONLoader, error) {
@@ -53,15 +54,20 @@ func main() {
 	flag.Var(&docs, "d", "JSON or YAML document to validate")
 	flag.Parse()
 
-	sdir, err := filepath.Abs(*schemadir)
-	if err != nil {
-		log.Fatalf("failed to resolve schema dir: %v", err)
-	}
 	// TODO: allow limited use of http urls? (e.g. schemastore.org)
-	sl := gojsonschema.NewReferenceLoader(fmt.Sprintf("file://%s", sdir))
+	var schemasource string
+	// canonicalize the provided schema path.
+	if _, err := url.Parse(*schemafile); err == nil {
+		// url is valid. use it.
+		schemasource = *schemafile
+	} else {
+		abspath, _ := filepath.Abs(*schemafile)
+		schemasource = fmt.Sprintf("file://%s", abspath)
+	}
+	sl := gojsonschema.NewReferenceLoader(schemasource)
 	schema, err := gojsonschema.NewSchema(sl)
 	if err != nil {
-		log.Fatalf("failed to create schema: %v", err)
+		log.Fatalf("failed to load schema: %v", err)
 	}
 	for _, input := range docs {
 		// TODO: consider something different for outputs. (e.g. TAP/junit)
