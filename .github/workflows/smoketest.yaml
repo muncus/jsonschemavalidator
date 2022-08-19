@@ -11,4 +11,4 @@ jobs:
         uses: muncus/jsonschemavalidator@HEAD
         with:
           schema: https://json.schemastore.org/github-workflow.json
-          documents: "testdata/workflow.yaml"
+          documents: "testdata/workflow.yaml testdata/*.yaml"
