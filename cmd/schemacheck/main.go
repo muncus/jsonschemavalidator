@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/muncus/jsonschemavalidator/output"
 	"github.com/xeipuuv/gojsonschema"
 	"gopkg.in/yaml.v3"
 )
@@ -24,6 +25,7 @@ func (f *ArrayFlag) Set(value string) error {
 }
 
 var schemafile = flag.String("s", "", "Directory to load json schemas from")
+var outputformat = flag.String("output", "github", "output format: 'text' or 'github'")
 var docs ArrayFlag
 
 func loaderForFile(fname string) (gojsonschema.JSONLoader, error) {
@@ -81,14 +83,10 @@ func main() {
 			log.Printf("error during validation: %v\n", err)
 			continue
 		}
-		if result.Valid() {
-			log.Printf("%s: 🎉 Success!\n", input)
-			continue
+		if *outputformat == "github" {
+			output.GithubOutput(os.Stdout, input, result)
 		} else {
-			log.Printf("%s: ❌ Validation Failed:\n", input)
-			for _, e := range result.Errors() {
-				log.Printf("- %v\n", e)
-			}
+			output.TextOutput(os.Stdout, input, result)
 		}
 	}
 }
