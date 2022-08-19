@@ -1,0 +1,14 @@
+on: [push]
+
+jobs:
+  validate_testdata:
+    runs-on: ubuntu-latest
+    name: "Smoke test - testdata"
+    steps:
+      - name: "Check out code"
+        uses: actions/checkout@v2
+      - name: "Validate"
+        uses: muncus/jsonschemavalidator
+        with:
+          schema: https://json.schemastore.org/github-workflow.json
+          documents: "testdata/workflow.yaml"

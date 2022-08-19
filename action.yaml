@@ -1,0 +1,16 @@
+name: 'Schema Validator'
+description: 'Validate YAML or JSON against a JSON Schema'
+inputs:
+  schema:
+    description: 'file path or URL of a JSON Schema definition'
+    required: true
+  documents:
+    description: 'space delimited list of files to validate'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - "-s"
+    - ${{inputs.schema}}
+    - ${{inputs.documents}}
