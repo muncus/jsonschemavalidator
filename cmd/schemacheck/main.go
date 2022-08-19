@@ -69,7 +69,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load schema: %v", err)
 	}
-	for _, input := range docs {
+	for _, input := range flag.Args() {
 		// TODO: consider something different for outputs. (e.g. TAP/junit)
 		l, err := loaderForFile(input)
 		if err != nil {
