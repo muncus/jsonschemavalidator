@@ -71,8 +71,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load schema: %v", err)
 	}
+	var hasErrors bool
 	for _, input := range flag.Args() {
-		// TODO: consider something different for outputs. (e.g. TAP/junit)
 		l, err := loaderForFile(input)
 		if err != nil {
 			log.Printf("failed to load %s: %v\n", input, err)
@@ -81,12 +81,21 @@ func main() {
 		result, err := schema.Validate(l)
 		if err != nil {
 			log.Printf("error during validation: %v\n", err)
+			hasErrors = true
 			continue
 		}
+		if !result.Valid() {
+			hasErrors = true
+		}
+		// TODO: consider something different for outputs. (e.g. TAP/junit)
 		if *outputformat == "github" {
 			output.GithubOutput(os.Stdout, input, result)
 		} else {
 			output.TextOutput(os.Stdout, input, result)
 		}
 	}
+	if !hasErrors {
+		os.Exit(0)
+	}
+	os.Exit(1)
 }

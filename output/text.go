@@ -17,8 +17,8 @@ var textOutputTemplate = template.Must(template.New("textoutput").Parse(`
 {{- end }}
 `))
 
-var githubOutputTemplate = template.Must(template.New("githuboutput").Parse(`
-::group::{{- .status }} {{ .source }}
+var githubOutputTemplate = template.Must(template.New("githuboutput").Parse(
+	`::group::{{- .status }} {{ .source }}
 {{- range $e := .errors }}
 ::error {{ $e }}
 {{- end }}
